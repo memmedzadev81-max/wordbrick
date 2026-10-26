@@ -1,0 +1,32 @@
+name: WordBrick.exe quraşdır
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - name: Yoxla (tsc + testlər + build)
+        run: npm run check
+      - name: WordBrick.exe qur
+        run: npm run build:exe
+      - name: Qovluğu hazırla
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path WordBrick | Out-Null
+          Copy-Item release/WordBrick.exe WordBrick/
+          Copy-Item installer/OXU-MENI.txt WordBrick/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WordBrick-Windows
+          path: WordBrick
+          retention-days: 90
